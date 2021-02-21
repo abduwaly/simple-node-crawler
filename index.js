@@ -21,6 +21,10 @@ const getAllLinks = async rootURL => {
 }
 
 const saveAsHTML = async (urls, folderName) => {
+  if (!fs.existsSync(`./${folderName}`)){
+    fs.mkdirSync(`./${folderName}`);
+  }
+
   const browser = await puppeteer.launch()
 
   await urls.forEach(async (url, index) => {
@@ -32,7 +36,7 @@ const saveAsHTML = async (urls, folderName) => {
         timeout: 0
       })
       let content = await response.text()
-  
+      
       fs.writeFile(
         `./${folderName}/${index}_${new Date().getTime()}.html`,
         content.toString(),
@@ -50,4 +54,14 @@ const saveAsHTML = async (urls, folderName) => {
 ;(async () => {
   const allLinks = await getAllLinks('http://www.uycnr.com/')
   saveAsHTML(allLinks, 'uycnr')
+})()
+
+;(async () => {
+  const allLinks = await getAllLinks('https://ulinix.cn/')
+  saveAsHTML(allLinks, 'ulinix')
+})()
+
+;(async () => {
+  const allLinks = await getAllLinks('http://uyghur.people.com.cn/')
+  saveAsHTML(allLinks, 'people')
 })()
