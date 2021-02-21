@@ -22,10 +22,14 @@ const getAllLinks = async (rootURL) => {
 
 const saveAsHTML = async (urls, folderName) => {
   const browser = await puppeteer.launch()
-  const page = await browser.newPage()
 
-  await urls.forEach(async (url, index) => {    
-    await page.goto(url)
+  await urls.forEach(async (url, index) => {
+    const page = await browser.newPage()
+    await page.goto(url, {
+      waitUntil: 'domcontentloaded',
+      timeout: 0
+    });
+
     let content = await page.content()
 
     fs.writeFile(
@@ -33,12 +37,13 @@ const saveAsHTML = async (urls, folderName) => {
       content.toString(),
       () => {
         console.log('✅', index, url);
+        page.close();
       }
     )
   })
 }
 
 (async ()=>{
-  const allLinks = await getAllLinks('http://www.uycnr.com/')
+  const allLinks = await getAllLinks('https://www.nur.cn/index.shtml')
   saveAsHTML(allLinks, 'uycnr')  
 })();
